@@ -6,10 +6,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import oit.is.z3638.kaizi.janken.model.Janken;
+
 @Controller
 public class JankenController {
   @GetMapping("/janken")
-  public String jankenGet() {
+  public String jankenGet(@RequestParam(name = "hand", required = false) String hand, ModelMap model) {
+    if (hand != null) {
+      String cpu = Janken.cpuHand();
+      String result = Janken.judge(hand, cpu);
+      model.addAttribute("your_hand", hand);
+      model.addAttribute("cpu_hand", cpu);
+      model.addAttribute("result", result);
+    }
     return "janken";
   }
 
