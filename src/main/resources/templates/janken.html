@@ -11,6 +11,13 @@
   <p>Hi <span sec:authentication="name"></span>
   </p>
 
+  <h2>エントリー</h2>
+  <ul>
+    <li th:each="Users, stat : ${Users3}">
+      [[${Users.name}]]
+    </li>
+  </ul>
+
   <a href="/janken?hand=グー">ぐー</a>
   <a href="/janken?hand=チョキ">ちょき</a>
   <a href="/janken?hand=パー">ぱー</a>
