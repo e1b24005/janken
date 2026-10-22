@@ -29,6 +29,15 @@ public class JankenController {
   @Autowired
   private Entry entry;
 
+  @GetMapping("/match")
+  public String match(@RequestParam int id, Principal prin, ModelMap model) {
+    String loginUserName = prin.getName(); // ログインユーザ名
+    User opponent = userMapper.selectById(id); // 相手を id で取得
+    model.addAttribute("loginUserName", loginUserName);
+    model.addAttribute("opponent", opponent);
+    return "match";
+  }
+
   @GetMapping("/janken")
   @Transactional
   public String jankenGet(
