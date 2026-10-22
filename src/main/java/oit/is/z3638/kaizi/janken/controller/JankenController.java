@@ -31,10 +31,37 @@ public class JankenController {
 
   @GetMapping("/match")
   public String match(@RequestParam int id, Principal prin, ModelMap model) {
-    String loginUserName = prin.getName(); // ログインユーザ名
-    User opponent = userMapper.selectById(id); // 相手を id で取得
+    String loginUserName = prin.getName();
+    User opponent = userMapper.selectById(id);
     model.addAttribute("loginUserName", loginUserName);
     model.addAttribute("opponent", opponent);
+    return "match";
+  }
+
+  @GetMapping("/fight")
+  public String fight(@RequestParam int id,
+      @RequestParam String hand,
+      Principal prin, ModelMap model) {
+
+    String loginUserName = prin.getName();
+    User me = userMapper.selectByName(loginUserName);
+    User opponent = userMapper.selectById(id);
+
+    String cpuHand = "Gu";
+    String result = Janken.judge(hand, cpuHand);
+
+    Match match = new Match();
+    match.setUser1(opponent.getId());
+    match.setUser2(me.getId());
+    match.setUser1Hand(cpuHand);
+    match.setUser2Hand(hand);
+    matchMapper.insertMatch(match);
+
+    model.addAttribute("loginUserName", loginUserName);
+    model.addAttribute("opponent", opponent);
+    model.addAttribute("your_hand", hand);
+    model.addAttribute("cpu_hand", cpuHand);
+    model.addAttribute("result", result);
     return "match";
   }
 
