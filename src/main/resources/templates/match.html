@@ -10,9 +10,9 @@
   <a href="/logout">ログアウト</a>
   <h1>Match</h1>
   <h2><span th:text="${loginUserName}"></span> V.S. <span th:text="${opponent.name}"></span></h2>
-  <a th:href="@{/fight(id=${opponent.id}, hand='Gu')}">ぐー</a>
-  <a th:href="@{/fight(id=${opponent.id}, hand='Choki')}">ちょき</a>
-  <a th:href="@{/fight(id=${opponent.id}, hand='Pa')}">ぱー</a>
+  <a th:href="@{/wait(id=${opponent.id}, hand='Gu')}">ぐー</a>
+  <a th:href="@{/wait(id=${opponent.id}, hand='Choki')}">ちょき</a>
+  <a th:href="@{/wait(id=${opponent.id}, hand='Pa')}">ぱー</a>
 
   <div th:if="${your_hand}">
     <p>あなたの手 <span th:text="${your_hand}"></span></p>
