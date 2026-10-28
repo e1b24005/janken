@@ -17,6 +17,8 @@ import oit.is.z3638.kaizi.janken.model.User;
 import oit.is.z3638.kaizi.janken.model.UserMapper;
 import oit.is.z3638.kaizi.janken.model.Match;
 import oit.is.z3638.kaizi.janken.model.MatchMapper;
+import oit.is.z3638.kaizi.janken.model.MatchInfo;
+import oit.is.z3638.kaizi.janken.model.MatchInfoMapper;
 
 @Controller
 public class JankenController {
@@ -27,7 +29,28 @@ public class JankenController {
   MatchMapper matchMapper;
 
   @Autowired
+  MatchInfoMapper matchinfoMapper;
+
+  @Autowired
   private Entry entry;
+
+  @GetMapping("/wait")
+  public String wait(@RequestParam int id,@RequestParam String hand, Principal prin, ModelMap model) {
+
+    String loginUserName = prin.getName();
+    User me = userMapper.selectByName(loginUserName);
+    User opponent = userMapper.selectById(id);
+
+    MatchInfo matchinfo = new MatchInfo();
+    matchinfo.setUser1(me.getId());
+    matchinfo.setUser2(opponent.getId());
+    matchinfo.setUser1Hand(hand);
+    matchinfo.setActive(true);
+    matchinfoMapper.insertMatchInfo(matchinfo);
+
+    model.addAttribute("loginUserName", loginUserName);
+    return "wait";
+  }
 
   @GetMapping("/match")
   public String match(@RequestParam int id, Principal prin, ModelMap model) {
@@ -77,6 +100,9 @@ public class JankenController {
 
       ArrayList<Match> Matches4 = matchMapper.selectAllMatches();
       model.addAttribute("Matches4", Matches4);
+
+      ArrayList<MatchInfo> MatchInfo1 = matchinfoMapper.selectAllMatchInfo();
+      model.addAttribute("MatchInfo1", MatchInfo1);
 
 
     String loginUser = prin.getName();
