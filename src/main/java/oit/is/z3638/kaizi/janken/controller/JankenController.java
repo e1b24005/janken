@@ -66,25 +66,44 @@ public class JankenController {
       @RequestParam String hand,
       Principal prin, ModelMap model) {
 
+
     String loginUserName = prin.getName();
     User me = userMapper.selectByName(loginUserName);
     User opponent = userMapper.selectById(id);
 
-    String cpuHand = "Gu";
-    String result = Janken.judge(hand, cpuHand);
+
+    MatchInfo matchinfo = matchinfoMapper.selectActiveMatchInfo(me.getId());
+    if (matchinfo == null) {
+      MatchInfo newinfo = new MatchInfo();
+      newinfo.setUser1(me.getId());
+      newinfo.setUser2(opponent.getId());
+      newinfo.setUser1Hand(hand);
+      newinfo.setActive(true);
+      matchinfoMapper.insertMatchInfo(newinfo);
+      return "wait";
+    }
+
+    MatchInfo newinfo = new MatchInfo();
+    newinfo.setUser1(me.getId());
+    newinfo.setUser2(opponent.getId());
+    newinfo.setUser1Hand(hand);
+    newinfo.setActive(true);
+    matchinfoMapper.insertMatchInfo(newinfo);
 
     Match match = new Match();
-    match.setUser1(opponent.getId());
-    match.setUser2(me.getId());
-    match.setUser1Hand(cpuHand);
+    match.setUser1(matchinfo.getUser1());
+    match.setUser2(matchinfo.getUser2());
+    match.setUser1Hand(matchinfo.getUser1Hand());
     match.setUser2Hand(hand);
+    match.setActive(true);
     matchMapper.insertMatch(match);
+
+    matchinfoMapper.updateIsActiveFalse(newinfo.getId());
+    matchinfoMapper.updateIsActiveFalse(matchinfo.getId());
 
     model.addAttribute("loginUserName", loginUserName);
     model.addAttribute("opponent", opponent);
     model.addAttribute("your_hand", hand);
-    model.addAttribute("cpu_hand", cpuHand);
-    model.addAttribute("result", result);
     return "match";
   }
 
