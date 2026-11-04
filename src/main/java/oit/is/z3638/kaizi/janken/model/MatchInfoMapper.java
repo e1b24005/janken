@@ -24,6 +24,9 @@ public interface MatchInfoMapper {
   @Select("SELECT * FROM matchinfo;")
   ArrayList<MatchInfo> selectAllMatchInfo();
 
-  @Update("UPDATE matchinfo SET isActive = FALSE WHERE id = #{id}")
-  void updateIsActiveFalse(int id);
+　@Select("SELECT * FROM matchinfo WHERE (user1 = #{userid} OR user2 = #{userid}) AND isActive = TRUE")
+　MatchInfo selectActiveMatchInfo(int userid);
+
+　@Update("UPDATE matchinfo SET isActive = FALSE WHERE id = #{id}")
+　void updateIsActiveFalse(int id);
 }
