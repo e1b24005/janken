@@ -9,6 +9,18 @@
 <body>
   <h1>相手の手を待ってます</h1>
   <p>Hi <span sec:authentication="name"></span>
+  <div id="kekka"></div>
 
+  <script>
+    const eventSource = new EventSource("/asyncKekka");
+
+    eventSource.onmessage = function (event) {
+      document.getElementById("kekka").innerHTML =
+        "<h2>結果</h2>" +
+        event.data + "<br><a href='/janken'>戻る</a>";
+
+      eventSource.close();
+    };
+  </script>
 
 </html>

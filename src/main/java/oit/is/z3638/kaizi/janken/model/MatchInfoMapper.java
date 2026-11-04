@@ -14,7 +14,7 @@ public interface MatchInfoMapper {
   MatchInfo selectById(int id);
 
   /**
-   * @param match
+   * @param matchinfo
    */
   @Insert("INSERT INTO matchinfo (user1,user2,user1Hand,isActive) VALUES (#{user1},#{user2},#{user1Hand},#{isActive});")
   @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id")
@@ -24,9 +24,9 @@ public interface MatchInfoMapper {
   @Select("SELECT * FROM matchinfo;")
   ArrayList<MatchInfo> selectAllMatchInfo();
 
-  @Select("SELECT * FROM matchinfo WHERE (user1 = #{userid} OR user2 = #{userid}) AND isActive = TRUE")
-  MatchInfo selectActiveMatchInfo(int userid);
+　@Select("SELECT * FROM matchinfo WHERE (user1 = #{userid} OR user2 = #{userid}) AND isActive = TRUE")
+　MatchInfo selectActiveMatchInfo(int userid);
 
-  @Update("UPDATE matchinfo SET isActive = FALSE WHERE id = #{id}")
-void updateIsActiveFalse(int id);
+　@Update("UPDATE matchinfo SET isActive = FALSE WHERE id = #{id}")
+　void updateIsActiveFalse(int id);
 }

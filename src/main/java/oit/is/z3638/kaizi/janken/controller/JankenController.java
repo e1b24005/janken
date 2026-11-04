@@ -20,6 +20,10 @@ import oit.is.z3638.kaizi.janken.model.MatchMapper;
 import oit.is.z3638.kaizi.janken.model.MatchInfo;
 import oit.is.z3638.kaizi.janken.model.MatchInfoMapper;
 
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import oit.is.z3638.kaizi.janken.service.AsyncKekka;
+
 @Controller
 public class JankenController {
   @Autowired
@@ -34,6 +38,17 @@ public class JankenController {
   @Autowired
   private Entry entry;
 
+  @Autowired
+  AsyncKekka asyncKekka;
+
+  @GetMapping("/asyncKekka")
+  @ResponseBody
+  public SseEmitter asyncKekka() {
+    SseEmitter emitter = new SseEmitter(0L);
+    asyncKekka.kekka(emitter);
+    return emitter;
+  }
+
   @GetMapping("/wait")
   public String wait(@RequestParam int id,@RequestParam String hand, Principal prin, ModelMap model) {
 
@@ -41,14 +56,50 @@ public class JankenController {
     User me = userMapper.selectByName(loginUserName);
     User opponent = userMapper.selectById(id);
 
-    MatchInfo matchinfo = new MatchInfo();
-    matchinfo.setUser1(me.getId());
-    matchinfo.setUser2(opponent.getId());
-    matchinfo.setUser1Hand(hand);
-    matchinfo.setActive(true);
-    matchinfoMapper.insertMatchInfo(matchinfo);
+    MatchInfo waitingMatch = null;
+
+    // 既存のselectAllMatchInfo()で待機中の相手を探す
+    for (MatchInfo m : matchinfoMapper.selectAllMatchInfo()) {
+      if (m.getUser1() == opponent.getId()
+          && m.getUser2() == me.getId()
+          && m.isActive()) {
+        waitingMatch = m;
+        break;
+      }
+    }
+
+    if (waitingMatch != null) {
+
+      // 先手と後手の情報をmatchesに登録
+      Match match = new Match();
+      match.setUser1(waitingMatch.getUser1());
+      match.setUser2(waitingMatch.getUser2());
+      match.setUser1Hand(waitingMatch.getUser1Hand());
+      match.setUser2Hand(hand);
+      match.setActive(true);
+
+      matchMapper.insertMatch(match);
+
+      // 対戦が成立したのでmatchinfoを非アクティブにする
+      matchinfoMapper.updateIsActiveFalse(waitingMatch.getId());
+
+      // 2人目はjankenに戻る
+      return "redirect:/janken";
+
+    } else {
+
+      // 先に手を選んだ人の情報をmatchinfoに登録
+      MatchInfo matchinfo = new MatchInfo();
+      matchinfo.setUser1(me.getId());
+      matchinfo.setUser2(opponent.getId());
+      matchinfo.setUser1Hand(hand);
+      matchinfo.setActive(true);
+
+      matchinfoMapper.insertMatchInfo(matchinfo);
+    }
 
     model.addAttribute("loginUserName", loginUserName);
+
     return "wait";
   }
 

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface MatchMapper {
@@ -26,4 +27,6 @@ public interface MatchMapper {
   @Select("SELECT * FROM matches;")
   ArrayList<Match> selectAllMatches();
 
+  @Update("UPDATE matches SET isActive = FALSE WHERE id = #{id}")
+  void updateIsActiveFalse(int id);
 }
